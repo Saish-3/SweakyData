@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemma 4 Studio — Google Gemini API Integration</title>
+  <meta name="description" content="Fast, modern web interface connected to Google's hosted Gemma 4 Mixture-of-Experts (gemma-4-26b-a4b-it) via the Gemini API.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="spark-icon">✨</div>
+        <div class="logo-text">
+          <h1>Gemma 4 <span class="badge-accent">MoE Studio</span></h1>
+          <p class="subtitle">Google DeepMind Gemma 4 via Gemini API</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div id="statusBadge" class="status-indicator checking">
+          <span class="status-dot"></span>
+          <span id="statusText">Checking API...</span>
+        </div>
+        <div class="model-select-wrapper">
+          <label for="modelSelect" class="sr-only">Model Selection</label>
+          <select id="modelSelect" aria-label="Model selection">
+            <option value="gemma-4-26b-a4b-it" selected>gemma-4-26b-a4b-it (Default MoE)</option>
+            <option value="gemma-4-31b-it">gemma-4-31b-it (Dense Flagship)</option>
+            <option value="gemma-4-12b-it">gemma-4-12b-it (Multimodal)</option>
+            <option value="gemma-4-e4b-it">gemma-4-e4b-it (Fast On-Device)</option>
+            <option value="gemma-4-e2b-it">gemma-4-e2b-it (Compact)</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-layout">
+      <!-- Left / Top: Prompt Playground -->
+      <section class="panel playground-panel">
+        <div class="panel-header">
+          <h2>Prompt Playground</h2>
+          <span class="pill-tag">256K Context Window</span>
+        </div>
+
+        <!-- Warning banner if API key is missing -->
+        <div id="apiKeyBanner" class="alert-banner hidden">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <strong>GEMINI_API_KEY Missing</strong>
+            <p>Add your API key to <code>.env</code> or run <code>export GEMINI_API_KEY="your-key"</code> and restart the server.</p>
+          </div>
+        </div>
+
+        <!-- Inspiration Chips -->
+        <div class="prompt-chips-section">
+          <span class="chips-label">Quick Ideas:</span>
+          <div class="chips-container">
+            <button type="button" class="chip-btn" data-prompt="Explain how Mixture-of-Experts (MoE) works in Gemma 4 in 3 concise bullet points.">🧠 MoE Architecture</button>
+            <button type="button" class="chip-btn" data-prompt="Write a Python FastAPI background task that periodically clears expired cache items with proper typing and logging.">⚡ Python Code</button>
+            <button type="button" class="chip-btn" data-prompt="Draft a winning 60-second hackathon pitch for an AI-powered automated code optimization tool.">🚀 Hackathon Pitch</button>
+            <button type="button" class="chip-btn" data-prompt="Analyze the trade-offs between dense LLMs and sparse Mixture-of-Experts architectures.">📊 Dense vs MoE</button>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <textarea
+            id="promptInput"
+            placeholder="Type your prompt here... (Press Cmd+Enter or Ctrl+Enter to send)"
+            rows="6"
+          ></textarea>
+          <div class="input-footer">
+            <div class="char-count"><span id="charCount">0</span> characters</div>
+            <div class="action-buttons">
+              <button type="button" id="clearBtn" class="btn btn-secondary">Clear</button>
+              <button type="button" id="sendBtn" class="btn btn-primary">
+                <span class="btn-text">Generate Response</span>
+                <span class="btn-icon">⚡</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right / Bottom: Model Response Output -->
+      <section class="panel output-panel">
+        <div class="panel-header">
+          <h2>Output Response</h2>
+          <div class="meta-tags">
+            <span id="latencyTag" class="meta-tag hidden">0ms</span>
+            <span id="activeModelTag" class="meta-tag">gemma-4-26b-a4b-it</span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="state-container hidden">
+          <div class="spinner-ring"></div>
+          <p class="loading-label">Gemma 4 is generating reasoning tokens...</p>
+          <span class="loading-sub">3.8B active params routing via MoE</span>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="state-container">
+          <div class="empty-icon">💬</div>
+          <h3>Awaiting Prompt</h3>
+          <p>Send a prompt or select a quick idea above to test Google Gemma 4 via the Gemini API.</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="state-container hidden error-box">
+          <div class="error-icon">❌</div>
+          <h3 id="errorTitle">Request Failed</h3>
+          <p id="errorMessage">An unexpected error occurred.</p>
+          <button type="button" id="retryBtn" class="btn btn-secondary retry-btn">Retry Request</button>
+        </div>
+
+        <!-- Response Content Display -->
+        <div id="responseContent" class="response-container hidden">
+          <div class="response-toolbar">
+            <span class="response-badge">Generated Output</span>
+            <button type="button" id="copyBtn" class="btn-copy">
+              <span id="copyIcon">📋</span> <span id="copyText">Copy</span>
+            </button>
+          </div>
+          <div id="responseBody" class="response-body"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Powered by <strong>Google Gemma 4</strong> &amp; the official <code>google-genai</code> Python SDK</p>
+      <div class="footer-links">
+        <a href="/docs" target="_blank" rel="noopener">Interactive API Docs (/docs)</a>
+        <span class="sep">•</span>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get Gemini API Key</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
