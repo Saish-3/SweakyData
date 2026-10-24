@@ -138,21 +138,21 @@ code, pre, .mono, [data-testid="stMetricValue"] {
     border-radius: var(--radius-md) !important;
 }
 
-/* Primary Button Styling (Audit with SweakyData): Red Box + Pure White Text */
+/* Primary Button Styling (Audit with SweakyData): Black Box + Pure White Text */
 div.stButton > button[kind="primary"] {
-    background: linear-gradient(180deg, #FF4B5C 0%, #D93A4A 100%) !important;
-    border: 1px solid #D93A4A !important;
+    background: linear-gradient(180deg, #1E222B 0%, #0A0C10 100%) !important;
+    border: 1px solid #000000 !important;
     border-radius: 10px !important;
-    box-shadow: 0 4px 14px rgba(217, 58, 74, 0.32) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
     transition: var(--transition) !important;
     padding: 0.6rem 1.3rem !important;
 }
 
 div.stButton > button[kind="primary"]:hover {
-    background: linear-gradient(180deg, #D93A4A 0%, #B82837 100%) !important;
-    border-color: #B82837 !important;
+    background: linear-gradient(180deg, #2D3340 0%, #14171E 100%) !important;
+    border-color: #000000 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 18px rgba(217, 58, 74, 0.45) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Force pure white text on primary button and all internal child elements */
