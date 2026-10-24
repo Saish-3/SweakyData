@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import concurrent.futures
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 import pandas as pd
@@ -364,18 +365,50 @@ if investigate_clicked:
             ev.id = f"E{i}"
 
         # Step 5: Query Gemma via Agent Skills
-        st.write("Dispatching Agent Skills & querying Gemma 4 for explanations...")
+        st.write("Dispatching Agent Skills & querying Gemma 4 in parallel...")
         t0 = time.perf_counter()
         explanations: Dict[str, Dict[str, Any]] = {}
+
+        # Instantly resolve NO_EVIDENCE clean checks without burning LLM network latency
         for ev in all_ev:
-            skill_name = skills_loader.route(ev.type)
-            prompt = skills_loader.build_prompt(skill_name, ev)
-            explanations[ev.id] = llm.ask_gemma(prompt, fallback_evidence_id=ev.id, fallback_summary=ev.summary)
+            if ev.status == "NO_EVIDENCE":
+                explanations[ev.id] = {
+                    "evidence_id": ev.id,
+                    "explanation": f"Column evaluated cleanly: {ev.summary}",
+                    "severity": "low",
+                    "hypothesis": "HYPOTHESIS: Statistical distribution is consistent with clean baseline data.",
+                    "suggested_fix": "No remediation needed. Feature safe to include in training.",
+                }
+
+        # Query PROVEN crimes concurrently in parallel
+        proven_items = [e for e in all_ev if e.status == "PROVEN"]
+        if proven_items:
+            def query_proven(ev_item):
+                s_name = skills_loader.route(ev_item.type)
+                p = skills_loader.build_prompt(s_name, ev_item)
+                return ev_item.id, llm.ask_gemma(p, fallback_evidence_id=ev_item.id, fallback_summary=ev_item.summary)
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(proven_items))) as pool:
+                future_results = pool.map(query_proven, proven_items)
+                for eid, expl in future_results:
+                    explanations[eid] = expl
+
         st.write(f"✓ Gemma 4 explanations complete ({time.perf_counter() - t0:.2f}s)")
 
         # Step 6: Case Summary
         st.write("Lead Detective synthesizing overall Case Verdict...")
-        summary_prompt = skills_loader.build_prompt("case-summary", all_ev)
+        compact_summary_ev = [
+            {
+                "id": e.id,
+                "type": e.type,
+                "status": e.status,
+                "columns": e.columns,
+                "metrics": e.metrics,
+                "summary": e.summary,
+            }
+            for e in all_ev
+        ]
+        summary_prompt = skills_loader.build_prompt("case-summary", compact_summary_ev)
         case_verdict = llm.ask_gemma(summary_prompt, fallback_evidence_id="ALL", fallback_summary="Forensic dataset audit complete.")
 
         status_box.update(label=f"Cross-examination complete in {time.perf_counter() - t_start:.2f}s", state="complete", expanded=False)

@@ -22,7 +22,7 @@ def get_genai_client():
         try:
             from google import genai
             from google.genai import types
-            return genai.Client(api_key=api_key.strip(), http_options=types.HttpOptions(timeout=30000))
+            return genai.Client(api_key=api_key.strip(), http_options=types.HttpOptions(timeout=8000))
         except Exception as e:
             logger.warning(f"Could not initialize google-genai client: {e}")
     return None
