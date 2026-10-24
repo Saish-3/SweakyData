@@ -1,9 +1,9 @@
-# 🔍 sweakyData
+# 🔍 SweakyData
 **AI ML Forensic Cross-Examiner**
 
 > *"Python proves the crimes. Gemma 4 explains the motives."*
 
-sweakyData cross-examines tabular CSV datasets before training machine learning models, constructing an unassailable chain of forensic evidence for target leakage, duplicate records, cross-split contamination, suspicious conflicting labels, and Simpson's paradox.
+SweakyData cross-examines tabular CSV datasets before training machine learning models, constructing an unassailable chain of forensic evidence for target leakage, duplicate records, cross-split contamination, suspicious conflicting labels, and Simpson's paradox.
 
 ---
 

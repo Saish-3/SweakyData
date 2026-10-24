@@ -91,7 +91,7 @@ def empty_state() -> None:
         <h3 style="margin: 0 0 8px 0; color: var(--blue-900); font-size: 1.35rem; font-weight:800;">Dataset Ready for Forensic Cross-Examination</h3>
         <p style="color: var(--text-primary); font-size: 0.95rem; max-width: 640px; margin: 0 auto 20px auto; line-height: 1.5;">
             Machine learning models fail silently when trained on contaminated data.
-            <strong>sweakyData</strong> cross-examines your CSV to uncover four hidden crimes before training:
+            <strong>SweakyData</strong> cross-examines your CSV to uncover four hidden crimes before training:
         </p>
         <div class="suspect-grid">
             <div class="suspect-card">
@@ -130,7 +130,7 @@ def empty_state() -> None:
     # In-card large primary Investigate button
     col_l, col_btn, col_r = st.columns([1, 2, 1])
     with col_btn:
-        if st.button("Audit with sweakyData", type="primary", use_container_width=True, key="empty_state_investigate_btn"):
+        if st.button("Audit with SweakyData", type="primary", use_container_width=True, key="empty_state_investigate_btn"):
             st.session_state["trigger_investigate"] = True
             st.rerun()
 

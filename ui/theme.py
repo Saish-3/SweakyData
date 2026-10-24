@@ -138,7 +138,7 @@ code, pre, .mono, [data-testid="stMetricValue"] {
     border-radius: var(--radius-md) !important;
 }
 
-/* Primary Button Styling (Audit with sweakyData): Red Box + Pure White Text */
+/* Primary Button Styling (Audit with SweakyData): Red Box + Pure White Text */
 div.stButton > button[kind="primary"] {
     background: linear-gradient(180deg, #FF4B5C 0%, #D93A4A 100%) !important;
     border: 1px solid #D93A4A !important;

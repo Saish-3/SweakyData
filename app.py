@@ -142,7 +142,7 @@ def generate_markdown_report(
     """Generates comprehensive forensic markdown report for download."""
     proven_crimes = [e for e in evidence_items if e.status == "PROVEN"]
     lines = [
-        f"# sweakyData — Forensic Investigation Report",
+        f"# SweakyData — Forensic Investigation Report",
         f"**Date:** {time.strftime('%Y-%m-%d %H:%M:%S UTC')}  ",
         f"**Dataset:** `{dataset_name}`  ",
         f"**Verdict:** {'CRIME SCENE CONTAMINATED' if proven_crimes else 'CASE DISMISSED / CLEAN'}  ",
@@ -196,7 +196,7 @@ st.sidebar.markdown(
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
         {ui_comp.ICON_SEARCH}
         <div>
-            <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800; letter-spacing:-0.01em;">sweakyData</h3>
+            <h3 style="margin:0; font-size:1.15rem; color:var(--blue-900); font-weight:800; letter-spacing:-0.01em;">SweakyData</h3>
             <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">AI ML Forensic Examiner</span>
         </div>
     </div>
@@ -238,7 +238,7 @@ else:
             st.sidebar.error(f"Error reading CSV: {e}")
 
 # 2. Big Full-Width Primary Investigate Button
-investigate_sidebar = st.sidebar.button("Audit with sweakyData", type="primary", use_container_width=True)
+investigate_sidebar = st.sidebar.button("Audit with SweakyData", type="primary", use_container_width=True)
 investigate_clicked = investigate_sidebar or st.session_state.get("trigger_investigate", False)
 if st.session_state.get("trigger_investigate", False):
     st.session_state["trigger_investigate"] = False
@@ -320,7 +320,7 @@ with st.sidebar.expander("Gemma Engine Status", expanded=False):
 # MAIN INTERFACE
 # ==========================================
 ui_comp.hero(
-    title="sweakyData",
+    title="SweakyData",
     subtitle="AI ML Forensic Cross-Examiner: Python proves the facts with mathematical certainty. Gemma 4 diagnoses the motives and root causes.",
 )
 
@@ -403,7 +403,7 @@ if investigate_clicked:
                 "type": e.type,
                 "status": e.status,
                 "columns": e.columns,
-                "metrics": e.metrics,
+                "metric": e.metric,
                 "summary": e.summary,
             }
             for e in all_ev
